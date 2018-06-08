@@ -1,0 +1,65 @@
+* Datacube Installation Scripts [WIP]
+
+Scripts to aid in setup of the Datacube software and its web interface Datacube
+UI.
+
+** Foreword
+This is a *work in progress* and is still incomplete. All scripts are written in
+batch style, automatically aborting on error thanks to bash's =set -e=. There 
+is some manual intervention required, e.g. to enter the password for sudo,
+enter some information this installer needs or to deal with the configuration 
+dialogs of the Debian package manager. At the moment, the scripts are not
+guaranteed to be idempotent, so running the scripts twice on the same system
+might fail.
+
+The scripts are developed on a Debian Strech system. Requirements such as 
+PostgreSQL are installed via =apt= while Python packages are installed via 
+=conda=, falling back on =pip= if necessary.
+
+As Ubuntu is based on Debian, the scripts might work on Ubuntu, too. Be aware
+though, that as package names, package versions or paths might differ, manual
+intervention might be necessary to make the scripts run cleanly.
+
+** Preparation
+- setup a (virtual) machine with Debian Stretch
+- create a regular user with sudo permission
+- install [[https://www.anaconda.com/download/#linux][Anaconda]] in your home
+  directory
+- create a directory called =datacube= in your home directory
+- download satellite data that should be added to the datacube
+
+** Setup of the Datacube
+- clone this repository into =~/datacube=
+- configure your desired database user and password in
+  =datacube-setup/scripts/01-install-datacube.sh=
+- run =datacube-setup/scripts/01-install-datacube.sh=
+- run =datacube-setup/scripts/02-prepare-data-import.sh=
+
+** Import/Ingest Data
+Unpack the downloaded scenes into =~/datacube/data/original_data=.
+
+Before the ingestion, 3 files need to be created:
+- a product type definition (YAML),
+- a prepare script (Python) and
+- an ingestion configuration (YAML).
+
+Examples for these files can be found in this repository in =metadata=, in the
+[[https://github.com/ceos-seo/agdc-v2/tree/master/ingest][AGDC repository]],
+in [[https://github.com/GRIDgva/SwissDataCube/blob/master/docs/customization/create_and_ingest_new_product.md][this guide for the Swiss Datacube]] and in the 
+[[https://github.com/opendatacube/datacube-core/tree/develop/docs/config_samples][Datacube repository]].
+For documentation about those files, see the [[https://datacube-core.readthedocs.io/en/latest/][Datacube documentation]].
+
+Adjust all file paths in =datacube-setup/scripts/03-ingest-data.sh= to correctly refer to the 
+original data and the 3 files from above. Run the script.
+
+** Setup of the Datacube UI
+
+- run =datacube-setup/scripts/04-install-datacube-ui.sh=
+- follow the instructions printed at the end of the script
+- run =datacube-setup/scripts/05-configure-celery.sh=
+
+** FAQ
+*** Error "populate() isn't reentrant" in Apache error log
+Run "manage.py check" inside the =data_cube_ui= directory and fix the issues
+reported there. This message might appear e.g. when using the Datacube UI in
+combination with Django 2 without having migrated to Django 2.
