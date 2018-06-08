@@ -63,3 +63,6 @@ original data and the 3 files from above. Run the script.
 Run "manage.py check" inside the =data_cube_ui= directory and fix the issues
 reported there. This message might appear e.g. when using the Datacube UI in
 combination with Django 2 without having migrated to Django 2.
+
+** Funding
+This project has received funding from the European Union's Horizon 2020 research and innovation programme under grant agreement No 642088. It is related to the project [[http://swos-service.eu][Satellite-based Wetland Observation Service]] (SWOS) and related work of the [[http://www.eo.uni-jena.de][Friedrich Schiller University Jena - Department for Earth Observation]]. 
