@@ -7,9 +7,9 @@ Please read the whole README at least once prior to using any of the scripts.
 
 ** Foreword
 This is a *work in progress* and is still incomplete. All scripts are written in
-batch style, automatically aborting on error thanks to bash's =set -e=. There 
+batch style, automatically aborting on error thanks to bash's =set -e=. There
 is manual intervention required, e.g. to enter the password for sudo,
-enter some information this installer needs or to deal with the configuration 
+enter some information this installer needs or to deal with the configuration
 dialogs of the Debian package manager. At the moment, the scripts are not
 guaranteed to be idempotent, so running the scripts twice on the same system
 might fail.
@@ -39,7 +39,7 @@ to configure it themselves. The Apache setup does *not* offer this option yet.
 
 ** Setup of the Datacube
 Change into =~/datacube= and clone this repository. Run
-=datacube-setup/scripts/01-install-datacube.sh= to install the Datacube
+=scripts/01-install-datacube.sh= to install the Datacube
 software, PostgreSQL and initialize the database for the Datacube. If you
 want to configure PostgreSQL manually, this is what the script will change in
 the default configuration:
@@ -63,13 +63,13 @@ scripts asks for.
 
 For more info, see [[https://github.com/ceos-seo/data_cube_ui/blob/master/docs/datacube_install.md#postgresql-configuration][https://github.com/ceos-seo/data_cube_ui/blob/master/docs/datacube_install.md#postgresql-configuration]].
 
-Run =datacube-setup/scripts/02-configure-data-import-environment.sh= to
+Run =scripts/02-configure-data-import-environment.sh= to
 install python packages required for data import and create the required
 directory structure.
 
 ** Setup of the Datacube UI
 
-Run =datacube-setup/scripts/03-install-datacube-ui.sh=. This will install the
+Run =scripts/03-install-datacube-ui.sh=. This will install the
 Datacube UI itself and required software such as: Apache 2 Webserver, Redis,
 ImageMagick, Django and Postfix.
 
@@ -88,7 +88,7 @@ After that, follow the instructions at the end of the script:
 - complete the configuration and setup of Django
 - apply workarounds of the 'Known Issues' section, if necessary
 
-Finally, to setup Celery as a daemon, run =datacube-setup/scripts/04-configure-celery.sh=.
+Finally, to setup Celery as a daemon, run =scripts/04-configure-celery.sh=.
 
 ** Import/Ingest Data
 Unpack the downloaded scenes into =~/datacube/data/original_data=.
@@ -100,11 +100,11 @@ Before the ingestion, 3 files need to be created:
 
 Examples for these files can be found in this repository in =metadata=, in the
 [[https://github.com/ceos-seo/agdc-v2/tree/master/ingest][AGDC repository]],
-in [[https://github.com/GRIDgva/SwissDataCube/blob/master/docs/customization/create_and_ingest_new_product.md][this guide for the Swiss Datacube]] and in the 
+in [[https://github.com/GRIDgva/SwissDataCube/blob/master/docs/customization/create_and_ingest_new_product.md][this guide for the Swiss Datacube]] and in the
 [[https://github.com/opendatacube/datacube-core/tree/develop/docs/config_samples][Datacube repository]].
 For documentation about those files, see the [[https://datacube-core.readthedocs.io/en/latest/][Datacube documentation]].
 
-Adjust all file paths in =datacube-setup/scripts/05-ingest-data.sh= to correctly refer to the 
+Adjust all file paths in =scripts/05-ingest-data.sh= to correctly refer to the
 original data and the 3 files from above. Run the script.
 
 ** Known Issues
@@ -122,4 +122,4 @@ reported there. This message might appear e.g. when using the Datacube UI in
 combination with Django 2 without having migrated to Django 2.
 
 ** Funding
-This project has received funding from the European Union's Horizon 2020 research and innovation programme under grant agreement No 642088. It is related to the project [[http://swos-service.eu][Satellite-based Wetland Observation Service]] (SWOS) and related work of the [[http://www.eo.uni-jena.de][Friedrich Schiller University Jena - Department for Earth Observation]]. 
+This project has received funding from the European Union's Horizon 2020 research and innovation programme under grant agreement No 642088. It is related to the project [[http://swos-service.eu][Satellite-based Wetland Observation Service]] (SWOS) and related work of the [[http://www.eo.uni-jena.de][Friedrich Schiller University Jena - Department for Earth Observation]].
