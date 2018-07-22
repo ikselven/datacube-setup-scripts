@@ -3,22 +3,31 @@
 Scripts to aid in setup of the Datacube software and its web interface Datacube
 UI.
 
+Please read the whole README at least once prior to using any of the scripts.
+
 ** Foreword
 This is a *work in progress* and is still incomplete. All scripts are written in
 batch style, automatically aborting on error thanks to bash's =set -e=. There 
-is some manual intervention required, e.g. to enter the password for sudo,
+is manual intervention required, e.g. to enter the password for sudo,
 enter some information this installer needs or to deal with the configuration 
 dialogs of the Debian package manager. At the moment, the scripts are not
 guaranteed to be idempotent, so running the scripts twice on the same system
 might fail.
 
-The scripts are developed on a Debian Strech system. Requirements such as 
-PostgreSQL are installed via =apt= while Python packages are installed via 
-=conda=, falling back on =pip= if necessary.
+The scripts are developed on a Debian Stretch system, and have been additionally
+tested on an Ubuntu 16.04 using upstart instead of systemd. Requirements such as
+PostgreSQL, Postfix and Apache are installed via =apt= while Python packages
+are installed via =conda=, falling back on =pip= if necessary.
 
-As Ubuntu is based on Debian, the scripts might work on Ubuntu, too. Be aware
-though, that as package names, package versions or paths might differ, manual
+On Ubuntu releases other than 16.04, the scripts may work. Be aware though,
+that as package names, package versions or paths might be different, manual
 intervention might be necessary to make the scripts run cleanly.
+
+** Warning
+Originally, the scripts have been developed with an empty environment in mind,
+i.e. no PostgreSQL, Apache Webserver or Postfix pre-installed. The setup of
+PostgreSQL has already been adjusted to give the user the option to configure
+it themselves. Apache and Postfix setup currently do *not* offer this option yet.
 
 ** Preparation
 - setup a (virtual) machine with Debian Stretch
@@ -29,11 +38,46 @@ intervention might be necessary to make the scripts run cleanly.
 - download satellite data that should be added to the datacube
 
 ** Setup of the Datacube
-- clone this repository into =~/datacube=
-- configure your desired database user and password in
-  =datacube-setup/scripts/01-install-datacube.sh=
-- run =datacube-setup/scripts/01-install-datacube.sh=
-- run =datacube-setup/scripts/02-prepare-data-import.sh=
+Change into =~/datacube= and clone this repository. Run
+=datacube-setup/scripts/01-install-datacube.sh= to install the Datacube
+software, PostgreSQL and initialize the database for the Datacube. If you
+want to configure PostgreSQL manually, this is what the script will change in
+the default configuration:
+
+: File: /etc/postgresql/*/main/pg_hba.conf
+: ------------------------------------------------------------------------------
+: <file content omitted>
+: host    all             ${DB_USER}       samenet                 trust
+
+This line is added at the end, =${DB_USER}= refers to the username the
+scripts asks for.
+
+: File: /etc/postgresql/*/main/postgresql.conf
+: ------------------------------------------------------------------------------
+: max_connections = 1000
+: unix_socket_directories = '/var/run/postgresql,/tmp'
+: shared_buffers = 4096MB
+: work_mem = 64MB
+: maintenance_work_mem = 256MB
+: timezone = 'UTC'
+
+For more info, see [[https://github.com/ceos-seo/data_cube_ui/blob/master/docs/datacube_install.md#postgresql-configuration][https://github.com/ceos-seo/data_cube_ui/blob/master/docs/datacube_install.md#postgresql-configuration]].
+
+Run =datacube-setup/scripts/02-configure-data-import-environment.sh= to
+install python packages required for data import and create the required
+directory structure.
+
+** Setup of the Datacube UI
+
+Run =datacube-setup/scripts/03-install-datacube-ui.sh=. This will install the
+Datacube UI itself and required software such as: Apache 2 Webserver, Redis,
+ImageMagick, Django and Postfix.
+
+After that, follow the instructions at the end of the script:
+- complete the configuration and setup of Django
+- apply workarounds of the 'Known Issues' section, if necessary
+
+Finally, to setup Celery as a daemon, run =datacube-setup/scripts/04-configure-celery.sh=.
 
 ** Import/Ingest Data
 Unpack the downloaded scenes into =~/datacube/data/original_data=.
@@ -49,16 +93,18 @@ in [[https://github.com/GRIDgva/SwissDataCube/blob/master/docs/customization/cre
 [[https://github.com/opendatacube/datacube-core/tree/develop/docs/config_samples][Datacube repository]].
 For documentation about those files, see the [[https://datacube-core.readthedocs.io/en/latest/][Datacube documentation]].
 
-Adjust all file paths in =datacube-setup/scripts/03-ingest-data.sh= to correctly refer to the 
+Adjust all file paths in =datacube-setup/scripts/05-ingest-data.sh= to correctly refer to the 
 original data and the 3 files from above. Run the script.
 
-** Setup of the Datacube UI
+** Known Issues
+*** =ImportError: /lib/x86_64-linux-gnu/libz.so.1: version `ZLIB_1.2.9' not found= in Apache error log
+In the current setup with a conda environment, it may occur, that python code
+run by Apache via mod_wsgi has trouble to see some of the libraries installed
+in the conda environment. There 2 workarounds for this, both are /hacky/:
+1. Download Zlib 1.2.9 and run =./configure prefix=/usr/local/; make; sudo make install=
+2. Extend =$PATH= and =$LD_LIBRARY_PATH= in =/etc/apache2/envvars= to include
+   the =bin= and the =lib= directory of the conda environment for the datacube.
 
-- run =datacube-setup/scripts/04-install-datacube-ui.sh=
-- follow the instructions printed at the end of the script
-- run =datacube-setup/scripts/05-configure-celery.sh=
-
-** FAQ
 *** Error "populate() isn't reentrant" in Apache error log
 Run "manage.py check" inside the =data_cube_ui= directory and fix the issues
 reported there. This message might appear e.g. when using the Datacube UI in

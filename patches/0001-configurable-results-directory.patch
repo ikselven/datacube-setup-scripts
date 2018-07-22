@@ -1,14 +1,5 @@
-diff --git a/.gitignore b/.gitignore
-index 2a977a0..182a7b4 100644
---- a/.gitignore
-+++ b/.gitignore
-@@ -3,3 +3,4 @@ apps/*/__pycache__/
- */__pycache__/
- data_cube_ui/migrations/
- data_cube_ui/__pycache__/
-+.idea
 diff --git a/apps/accounts/views.py b/apps/accounts/views.py
-index 1dde884..abb6e09 100755
+index 1dde884..0080c0a 100755
 --- a/apps/accounts/views.py
 +++ b/apps/accounts/views.py
 @@ -231,8 +231,8 @@ def registration(request):
@@ -31,24 +22,6 @@ index 1dde884..abb6e09 100755
                            'rb')
                  att = MIMEImage(fp.read())  # Or use MIMEImage, etc
                  fp.close()
-@@ -281,7 +281,7 @@ def registration(request):
-         context = {'title': _("Registration"), 'form': RegistrationForm(),}
-         if request.GET:
-             next = request.POST.get('next', "/")
--            if request.user.is_authenticated():
-+            if request.user.is_authenticated:
-                 return redirect(next)
-             context['next'] = next
-         return render(request, 'registration/registration.html', context)
-@@ -337,7 +337,7 @@ def login(request):
-         context = {'title': _("Log in"), 'form': LoginForm() }
-         if request.GET:
-             next = request.GET.get('next', "/")
--            if request.user.is_authenticated():
-+            if request.user.is_authenticated:
-                 return redirect(next)
-             context['next'] = next
-         return render(request, 'registration/login.html', context)
 diff --git a/apps/cloud_coverage/models.py b/apps/cloud_coverage/models.py
 index aed81ec..e17742d 100644
 --- a/apps/cloud_coverage/models.py
@@ -73,7 +46,7 @@ index aed81ec..e17742d 100644
      class Meta(BaseQuery.Meta):
          unique_together = (('satellite', 'area_id', 'time_start', 'time_end', 'latitude_max', 'latitude_min',
 diff --git a/apps/coastal_change/models.py b/apps/coastal_change/models.py
-index 9155239..af8a3de 100755
+index 9155239..7d39ac5 100755
 --- a/apps/coastal_change/models.py
 +++ b/apps/coastal_change/models.py
 @@ -18,7 +18,9 @@
@@ -86,12 +59,9 @@ index 9155239..af8a3de 100755
  from django.db import models
  from django.core.exceptions import ValidationError
  
-@@ -72,9 +74,9 @@ class Query(BaseQuery):
-     time_end = models.IntegerField()
-     time_start = models.IntegerField()
+@@ -74,7 +76,7 @@ class Query(BaseQuery):
  
--    animated_product = models.ForeignKey(AnimationType)
-+    animated_product = models.ForeignKey(AnimationType, on_delete=models.CASCADE)
+     animated_product = models.ForeignKey(AnimationType)
  
 -    base_result_dir = '/datacube/ui_results/coastal_change'
 +    base_result_dir = os.path.join(settings.RESULTS_DATA_DIR, 'coastal_change')
@@ -99,7 +69,7 @@ index 9155239..af8a3de 100755
      class Meta(BaseQuery.Meta):
          unique_together = (('satellite', 'area_id', 'time_start', 'time_end', 'latitude_max', 'latitude_min',
 diff --git a/apps/custom_mosaic_tool/models.py b/apps/custom_mosaic_tool/models.py
-index e80a3a2..d67b625 100755
+index e80a3a2..bb07b8e 100755
 --- a/apps/custom_mosaic_tool/models.py
 +++ b/apps/custom_mosaic_tool/models.py
 @@ -18,7 +18,9 @@
@@ -112,16 +82,9 @@ index e80a3a2..d67b625 100755
  from django.db import models
  from django.core.exceptions import ValidationError
  
-@@ -79,11 +81,11 @@ class Query(BaseQuery):
-     foreign keys should define __str__ for a human readable name.
- 
-     """
--    query_type = models.ForeignKey(ResultType)
--    animated_product = models.ForeignKey(AnimationType)
--    compositor = models.ForeignKey(Compositor)
-+    query_type = models.ForeignKey(ResultType, on_delete=models.CASCADE)
-+    animated_product = models.ForeignKey(AnimationType, on_delete=models.CASCADE)
-+    compositor = models.ForeignKey(Compositor, on_delete=models.CASCADE)
+@@ -83,7 +85,7 @@ class Query(BaseQuery):
+     animated_product = models.ForeignKey(AnimationType)
+     compositor = models.ForeignKey(Compositor)
  
 -    base_result_dir = '/datacube/ui_results/custom_mosaic_tool'
 +    base_result_dir = os.path.join(settings.RESULTS_DATA_DIR, 'custom_mosaic_tool')
@@ -232,7 +195,7 @@ index 612e735..fd504c3 100644
              "SAMPLE_CUBE_4326_{tile_index[0]}_{tile_index[1]}_{start_time}.nc",
              'summary':
 diff --git a/apps/dc_algorithm/management/commands/band_math_app/models.py b/apps/dc_algorithm/management/commands/band_math_app/models.py
-index 3e5c42c..2cc9c72 100644
+index 3e5c42c..7c7fd34 100644
 --- a/apps/dc_algorithm/management/commands/band_math_app/models.py
 +++ b/apps/dc_algorithm/management/commands/band_math_app/models.py
 @@ -18,6 +18,7 @@
@@ -243,12 +206,8 @@ index 3e5c42c..2cc9c72 100644
  
  from django.db import models
  from django.core.exceptions import ValidationError
-@@ -59,11 +60,11 @@ class Query(BaseQuery):
-     foreign keys should define __str__ for a human readable name.
- 
-     """
--    compositor = models.ForeignKey(Compositor)
-+    compositor = models.ForeignKey(Compositor, on_delete=models.CASCADE)
+@@ -62,8 +63,8 @@ class Query(BaseQuery):
+     compositor = models.ForeignKey(Compositor)
  
      #TODO: add color scale here
 -    color_scale_path = '/home/' + settings.LOCAL_USER + '/Datacube/data_cube_ui/utils/color_scales/default_color_scale'
@@ -259,7 +218,7 @@ index 3e5c42c..2cc9c72 100644
      class Meta(BaseQuery.Meta):
          unique_together = (('satellite', 'area_id', 'time_start', 'time_end', 'latitude_max', 'latitude_min',
 diff --git a/apps/dc_algorithm/management/commands/base_app/models.py b/apps/dc_algorithm/management/commands/base_app/models.py
-index c42919e..dc2fba7 100644
+index c42919e..8ff58cc 100644
 --- a/apps/dc_algorithm/management/commands/base_app/models.py
 +++ b/apps/dc_algorithm/management/commands/base_app/models.py
 @@ -18,7 +18,9 @@
@@ -272,16 +231,8 @@ index c42919e..dc2fba7 100644
  from django.db import models
  from django.core.exceptions import ValidationError
  
-@@ -87,12 +89,12 @@ class Query(BaseQuery):
-     """
- 
-     # TODO: Are there querytypes, animation types, or compositors that need to be distinguished?
--    query_type = models.ForeignKey(ResultType)
--    animated_product = models.ForeignKey(AnimationType)
--    compositor = models.ForeignKey(Compositor)
-+    query_type = models.ForeignKey(ResultType, on_delete=models.CASCADE)
-+    animated_product = models.ForeignKey(AnimationType, on_delete=models.CASCADE)
-+    compositor = models.ForeignKey(Compositor, on_delete=models.CASCADE)
+@@ -92,7 +94,7 @@ class Query(BaseQuery):
+     compositor = models.ForeignKey(Compositor)
  
      # TODO: Fill out the configuration paths
 -    base_result_dir = '/datacube/ui_results/app_name'
@@ -290,18 +241,9 @@ index c42919e..dc2fba7 100644
      class Meta(BaseQuery.Meta):
          unique_together = (
 diff --git a/apps/dc_algorithm/models/abstract_base_models.py b/apps/dc_algorithm/models/abstract_base_models.py
-index 147dad9..2245e2a 100644
+index 147dad9..908bf44 100644
 --- a/apps/dc_algorithm/models/abstract_base_models.py
 +++ b/apps/dc_algorithm/models/abstract_base_models.py
-@@ -65,7 +65,7 @@ class Query(models.Model):
- 
-     area_id = models.CharField(max_length=100)
- 
--    satellite = models.ForeignKey('dc_algorithm.Satellite')
-+    satellite = models.ForeignKey('dc_algorithm.Satellite', on_delete=models.CASCADE)
- 
-     time_start = models.DateField('time_start')
-     time_end = models.DateField('time_end')
 @@ -79,7 +79,7 @@ class Query(models.Model):
      #false by default, only change is false-> true
      complete = models.BooleanField(default=False)
@@ -311,19 +253,6 @@ index 147dad9..2245e2a 100644
  
      class Meta:
          abstract = True
-diff --git a/apps/dc_algorithm/models/application_models.py b/apps/dc_algorithm/models/application_models.py
-index b3f9025..73af008 100644
---- a/apps/dc_algorithm/models/application_models.py
-+++ b/apps/dc_algorithm/models/application_models.py
-@@ -207,7 +207,7 @@ class Application(models.Model):
- 
-     color_scale = models.CharField(max_length=250, default="", blank=True, null=True)
- 
--    application_group = models.ForeignKey('ApplicationGroup', null=True, blank=True)
-+    application_group = models.ForeignKey('ApplicationGroup', on_delete=models.CASCADE, null=True, blank=True)
- 
-     def __str__(self):
-         return self.id
 diff --git a/apps/dc_algorithm/views.py b/apps/dc_algorithm/views.py
 index 115261f..ddb558e 100644
 --- a/apps/dc_algorithm/views.py
@@ -381,7 +310,7 @@ index 115261f..ddb558e 100644
              elif requested_task.status == "ERROR":
                  response['status'] = "ERROR"
 diff --git a/apps/fractional_cover/models.py b/apps/fractional_cover/models.py
-index 9934b24..c1a740d 100755
+index 9934b24..64b2a23 100755
 --- a/apps/fractional_cover/models.py
 +++ b/apps/fractional_cover/models.py
 @@ -18,7 +18,9 @@
@@ -394,12 +323,9 @@ index 9934b24..c1a740d 100755
  from django.db import models
  from django.core.exceptions import ValidationError
  
-@@ -58,9 +60,9 @@ class Query(BaseQuery):
-     foreign keys should define __str__ for a human readable name.
- 
+@@ -60,7 +62,7 @@ class Query(BaseQuery):
      """
--    compositor = models.ForeignKey(Compositor)
-+    compositor = models.ForeignKey(Compositor, on_delete=models.CASCADE)
+     compositor = models.ForeignKey(Compositor)
  
 -    base_result_dir = '/datacube/ui_results/fractional_cover'
 +    base_result_dir = os.path.join(settings.RESULTS_DATA_DIR, 'fractional_cover')
@@ -441,7 +367,7 @@ index 7e27892..c99bfad 100755
  
      class Meta(BaseQuery.Meta):
 diff --git a/apps/slip/models.py b/apps/slip/models.py
-index 7800fd6..3a9be19 100755
+index 7800fd6..b640c60 100755
 --- a/apps/slip/models.py
 +++ b/apps/slip/models.py
 @@ -18,7 +18,9 @@
@@ -454,12 +380,8 @@ index 7800fd6..3a9be19 100755
  from django.db import models
  from django.core.exceptions import ValidationError
  
-@@ -71,10 +73,10 @@ class Query(BaseQuery):
- 
-     """
- 
--    baseline_method = models.ForeignKey(BaselineMethod)
-+    baseline_method = models.ForeignKey(BaselineMethod, on_delete=models.CASCADE)
+@@ -74,7 +76,7 @@ class Query(BaseQuery):
+     baseline_method = models.ForeignKey(BaselineMethod)
      baseline_length = models.IntegerField(default=10)
  
 -    base_result_dir = '/datacube/ui_results/slip'
@@ -468,7 +390,7 @@ index 7800fd6..3a9be19 100755
      class Meta(BaseQuery.Meta):
          unique_together = (
 diff --git a/apps/spectral_indices/models.py b/apps/spectral_indices/models.py
-index e73f90e..8a1781f 100644
+index e73f90e..c8b3eac 100644
 --- a/apps/spectral_indices/models.py
 +++ b/apps/spectral_indices/models.py
 @@ -18,6 +18,7 @@
@@ -479,14 +401,8 @@ index e73f90e..8a1781f 100644
  
  from django.db import models
  from django.core.exceptions import ValidationError
-@@ -67,20 +68,20 @@ class Query(BaseQuery):
-     foreign keys should define __str__ for a human readable name.
- 
-     """
--    compositor = models.ForeignKey(Compositor)
--    query_type = models.ForeignKey(ResultType)
-+    compositor = models.ForeignKey(Compositor, on_delete=models.CASCADE)
-+    query_type = models.ForeignKey(ResultType, on_delete=models.CASCADE)
+@@ -71,16 +72,16 @@ class Query(BaseQuery):
+     query_type = models.ForeignKey(ResultType)
  
      color_scale_path = {
 -        'ndvi': '/home/' + settings.LOCAL_USER + '/Datacube/data_cube_ui/utils/color_scales/ndvi',
@@ -511,7 +427,7 @@ index e73f90e..8a1781f 100644
      class Meta(BaseQuery.Meta):
          unique_together = (('satellite', 'area_id', 'time_start', 'time_end', 'latitude_max', 'latitude_min',
 diff --git a/apps/tsm/models.py b/apps/tsm/models.py
-index 8abe227..1dd8db1 100755
+index 8abe227..7eef74e 100755
 --- a/apps/tsm/models.py
 +++ b/apps/tsm/models.py
 @@ -18,6 +18,7 @@
@@ -522,14 +438,9 @@ index 8abe227..1dd8db1 100755
  
  from django.db import models
  from django.core.exceptions import ValidationError
-@@ -77,26 +78,26 @@ class Query(BaseQuery):
- 
-     """
- 
--    query_type = models.ForeignKey(ResultType)
--    animated_product = models.ForeignKey(AnimationType)
-+    query_type = models.ForeignKey(ResultType, on_delete=models.CASCADE)
-+    animated_product = models.ForeignKey(AnimationType, on_delete=models.CASCADE)
+@@ -80,23 +81,23 @@ class Query(BaseQuery):
+     query_type = models.ForeignKey(ResultType)
+     animated_product = models.ForeignKey(AnimationType)
  
 -    base_result_dir = '/datacube/ui_results/tsm'
 +    base_result_dir = os.path.join(settings.RESULTS_DATA_DIR, 'tsm')
@@ -560,7 +471,7 @@ index 8abe227..1dd8db1 100755
  
      class Meta(BaseQuery.Meta):
 diff --git a/apps/urbanization/models.py b/apps/urbanization/models.py
-index d4aa3eb..6e671b2 100644
+index d4aa3eb..687ea9d 100644
 --- a/apps/urbanization/models.py
 +++ b/apps/urbanization/models.py
 @@ -18,6 +18,7 @@
@@ -571,12 +482,9 @@ index d4aa3eb..6e671b2 100644
  
  from django.db import models
  from django.core.exceptions import ValidationError
-@@ -59,9 +60,9 @@ class Query(BaseQuery):
-     foreign keys should define __str__ for a human readable name.
- 
+@@ -61,7 +62,7 @@ class Query(BaseQuery):
      """
--    compositor = models.ForeignKey(Compositor)
-+    compositor = models.ForeignKey(Compositor, on_delete=models.CASCADE)
+     compositor = models.ForeignKey(Compositor)
  
 -    base_result_dir = '/datacube/ui_results/urbanization'
 +    base_result_dir = os.path.join(settings.RESULTS_DATA_DIR, 'urbanization')
@@ -584,7 +492,7 @@ index d4aa3eb..6e671b2 100644
      class Meta(BaseQuery.Meta):
          unique_together = (('satellite', 'area_id', 'time_start', 'time_end', 'latitude_max', 'latitude_min',
 diff --git a/apps/water_detection/models.py b/apps/water_detection/models.py
-index 2917d25..a28bb36 100755
+index 2917d25..150ca08 100755
 --- a/apps/water_detection/models.py
 +++ b/apps/water_detection/models.py
 @@ -18,6 +18,7 @@
@@ -595,14 +503,9 @@ index 2917d25..a28bb36 100755
  
  from django.db import models
  from django.core.exceptions import ValidationError
-@@ -76,19 +77,19 @@ class Query(BaseQuery):
- 
-     """
- 
--    query_type = models.ForeignKey(ResultType)
--    animated_product = models.ForeignKey(AnimationType)
-+    query_type = models.ForeignKey(ResultType, on_delete=models.CASCADE)
-+    animated_product = models.ForeignKey(AnimationType, on_delete=models.CASCADE)
+@@ -79,16 +80,16 @@ class Query(BaseQuery):
+     query_type = models.ForeignKey(ResultType)
+     animated_product = models.ForeignKey(AnimationType)
  
 -    base_result_dir = '/datacube/ui_results/water_detection'
 +    base_result_dir = os.path.join(settings.RESULTS_DATA_DIR, 'water_detection')
@@ -623,34 +526,19 @@ index 2917d25..a28bb36 100755
  
      class Meta(BaseQuery.Meta):
 diff --git a/data_cube_ui/settings.py b/data_cube_ui/settings.py
-index 3cc7a6c..5d8cd98 100755
+index 3cc7a6c..eafe70b 100755
 --- a/data_cube_ui/settings.py
 +++ b/data_cube_ui/settings.py
 @@ -57,6 +57,8 @@ EMAIL_PORT = '25'
  
  LOCAL_USER = "localuser"
  
-+RESULTS_DATA_DIR = "/home/developer/datacube/data/ui_results"
++RESULTS_DATA_DIR = "path/to/datacube/data/ui_results"
 +
  INSTALLED_APPS = [
      'apps.custom_mosaic_tool',
      'apps.water_detection',
-@@ -83,13 +85,12 @@ INSTALLED_APPS = [
-     'bootstrap3',
- ]
- 
--MIDDLEWARE_CLASSES = [
-+MIDDLEWARE = [
-     'django.middleware.security.SecurityMiddleware',
-     'django.contrib.sessions.middleware.SessionMiddleware',
-     'django.middleware.common.CommonMiddleware',
-     'django.middleware.csrf.CsrfViewMiddleware',
-     'django.contrib.auth.middleware.AuthenticationMiddleware',
--    'django.contrib.auth.middleware.SessionAuthenticationMiddleware',
-     'django.contrib.messages.middleware.MessageMiddleware',
-     'django.middleware.clickjacking.XFrameOptionsMiddleware',
- ]
-@@ -190,7 +191,7 @@ STATIC_URL = '/static/'
+@@ -190,7 +192,7 @@ STATIC_URL = '/static/'
  STATIC_ROOT = '/static/'
  
  STATICFILES_DIRS = [
@@ -675,9 +563,3 @@ index 3125258..1717e01 100644
  
      class Meta(BaseQuery.Meta):
          unique_together = (('platform', 'area_id', 'time_start', 'time_end', 'latitude_max', 'latitude_min', 'longitude_max',
-diff --git a/utils b/utils
---- a/utils
-+++ b/utils
-@@ -1 +1 @@
--Subproject commit 7301647f80777f6fbb36bc503178480ae6a9d5b0
-+Subproject commit 7301647f80777f6fbb36bc503178480ae6a9d5b0-dirty

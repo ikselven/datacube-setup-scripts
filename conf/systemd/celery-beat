@@ -1,9 +1,9 @@
-CELERY_BIN="/home/developer/anaconda3/envs/cubeenv/bin/celery"
+CELERY_BIN="path/to/bin/celery"
 
 CELERY_APP="data_cube_ui"
 DJANGO_SETTINGS_MODULE="data_cube_ui.settings"
 
-#CELERY_CHDIR: see WorkingDirectory in unit file
+CELERY_CHDIR="path/to/datacube/data_cube_ui"
 
 # extra command-line arguments for the beat service
 CELERYBEAT_OPTS=""

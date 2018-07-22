@@ -1,4 +1,19 @@
 #!/bin/bash
+#
+# Copyright (C) 2018 Felix Glaser
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 set -e
 
@@ -26,14 +41,6 @@ echo "[DATACUBE-SETUP] Creating datacube data directories..."
 mkdir -vp "$DATA_HOME"
 mkdir -vp "$DATA_HOME/ingested_data"
 mkdir -vp "$DATA_HOME/original_data"
-declare -r UIDIR="$DATA_HOME/ui_results"
-mkdir -vp "$UIDIR"
-mkdir -vp "${UIDIR}_temp"
-mkdir -vp "$UIDIR/custom_mosaic"
-mkdir -vp "$UIDIR/fractional_cover"
-mkdir -vp "$UIDIR/tsm"
-mkdir -vp "$UIDIR/water_detection"
-mkdir -vp "$UIDIR/slip"
 
 chmod --recursive 775 "$DATA_HOME"
 

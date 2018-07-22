@@ -3,10 +3,10 @@ Description=Celery Beat Service
 After=network.target
 
 [Service]
-User=developer
-Group=developer
+User=localuser
+Group=localuser
 EnvironmentFile=/etc/conf.d/celery-beat
-WorkingDirectory=/home/developer/datacube/data_cube_ui
+WorkingDirectory="${CELERYD_CHDIR}"
 ExecStart=/bin/sh -c '${CELERY_BIN} beat \
     -A ${CELERY_APP} \
     --pidfile=${CELERYBEAT_PID_FILE} \

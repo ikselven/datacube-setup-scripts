@@ -4,10 +4,10 @@ After=network.target
 
 [Service]
 Type=forking
-User=developer
-Group=developer
+User=localuser
+Group=localuser
 EnvironmentFile=/etc/conf.d/celery
-WorkingDirectory=/home/developer/datacube/data_cube_ui
+WorkingDirectory="${CELERYD_CHDIR}"
 ExecStart=/bin/sh -c '${CELERY_BIN} multi start ${CELERYD_NODES} \
     -A ${CELERY_APP} \
     --pidfile=${CELERYD_PID_FILE} \
