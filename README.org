@@ -26,8 +26,8 @@ intervention might be necessary to make the scripts run cleanly.
 ** Warning
 Originally, the scripts have been developed with an empty environment in mind,
 i.e. no PostgreSQL, Apache Webserver or Postfix pre-installed. The setup of
-PostgreSQL has already been adjusted to give the user the option to configure
-it themselves. Apache and Postfix setup currently do *not* offer this option yet.
+PostgreSQL and Postfix have already been adjusted to give the user the option
+to configure it themselves. The Apache setup does *not* offer this option yet.
 
 ** Preparation
 - setup a (virtual) machine with Debian Stretch
@@ -72,6 +72,17 @@ directory structure.
 Run =datacube-setup/scripts/03-install-datacube-ui.sh=. This will install the
 Datacube UI itself and required software such as: Apache 2 Webserver, Redis,
 ImageMagick, Django and Postfix.
+
+In the dialog, that is shown during installation of Postfix, choose to
+configure as an "Internet site".
+
+If you decide to setup/configure Postfix yourself, here is what the script configures:
+: File: /etc/postfix/main.cf
+: -----------------------------------------------------------------------------
+: inet_interfaces = localhost
+
+For more info, see the end of
+[[https://github.com/ceos-seo/data_cube_ui/blob/master/docs/ui_install.md#installation_process][https://github.com/ceos-seo/data_cube_ui/blob/master/docs/ui_install.md#installation_process]]
 
 After that, follow the instructions at the end of the script:
 - complete the configuration and setup of Django

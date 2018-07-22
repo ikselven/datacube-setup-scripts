@@ -164,23 +164,46 @@ $(cat /etc/timezone | _sedescape)\
 fi
 
 
-echo "[DCUI-SETUP] Installing Postfix..."
-# TODO: automate interactive setup of postfix
-sudo apt install --assume-yes postfix mailutils
-if [[ "$INITSYS" == "systemd" ]]; then
-    sudo systemctl stop postfix.service
-else
-    sudo service postfix stop
-fi
+# copy database login from datacube.conf into .pgpass file
+echo "*:*:*:$(_exsed --quiet "s/^db_username: (.*)$/\1/p" "$HOME/.datacube.conf"):$(_exsed --quiet "s/^db_password: (.*)$/\1/p" "$HOME/.datacube.conf" | _exsed -e 's/:/\\:/g' -e 's/\\/\\\\/g')" \
+    >> "$HOME/.pgpass"
 
-echo "[DCUI-SETUP] Configuring Postfix..."
-_backup -s /etc/postfix/main.cf
-_exsed -s --in-place 's/(inet_interfaces = ).*/\1localhost/' /etc/postfix/main.cf
-if [[ "$INITSYS" == "systemd" ]]; then
-    sudo systemctl start postfix.service
-else
-    sudo service postfix start
-fi
+
+echo "[DCUI-SETUP] Checking for Postfix installation..."
+echo -n "Should Postfix be installed and configured automatically? [y/N] "
+read install_postfix
+case "$install_postfix" in
+    y|Y)
+        echo "[DCUI-SETUP] Installing Postfix..."
+        # TODO: automate interactive setup of postfix
+        sudo apt install --assume-yes postfix mailutils
+        # TODO: is stopping the service required or would a restart suffice?
+        if [[ "$INITSYS" == "systemd" ]]; then
+            sudo systemctl stop postfix.service
+        else
+            sudo service postfix stop
+        fi
+
+        echo "[DCUI-SETUP] Configuring Postfix..."
+        _backup -s /etc/postfix/main.cf
+        _exsed -s --in-place 's/(inet_interfaces = ).*/\1localhost/' /etc/postfix/main.cf
+        if [[ "$INITSYS" == "systemd" ]]; then
+            sudo systemctl start postfix.service
+        else
+            sudo service postfix start
+        fi
+        ;;
+    *)
+        echo "[DCUI-SETUP] Skipping installation and configuration of Postfix..."
+        echo "[DCUI-SETUP] Please take a look into the README and see, what needs to be configured."
+        echo "[DCUI-SETUP] Apply the configuration, reload/restart Postfix and return to this installer."
+        echo -n "Continue setup? [ENTER]"
+        read shall_continue
+        unset shall_continue
+        ;;
+esac
+unset install_postfix
+
 
 echo "[DCUI-SETUP] Configuring Apache Web Server..."
 echo -n "Please enter the value for ServerName (i.e. the domain name): "
