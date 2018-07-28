@@ -1,4 +1,3 @@
-#!/bin/bash
 #
 # Copyright (C) 2018 Felix Glaser
 #
@@ -15,32 +14,44 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-###############################################################################
+################################################################################
 # Utility script to be sourced by the other scripts or for interactive work
-###############################################################################
+################################################################################
 
 # prevent this file from being executed
 if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then
-    echo "This file is intended to be sourced. Executing it is pointless." >> /dev/stderr
+    echo "Error: This file is intended to be sourced. Executing it is pointless." >> /dev/stderr
     exit 1
 fi
 
-###############################################################################
+################################################################################
 # Constants
-###############################################################################
+################################################################################
+if [[ -z "$SCRIPTDIR" ]]; then
+    echo "Error: Cannot find out, in which directory I am. Aborting." >> /dev/stderr
+    exit 1
+fi
 
-# name of the datacube conda environment
-declare -r CUBEENV="cubeenv"
+source "$SCRIPTDIR/config"
+if [[ -z "$CONDA_SH" ]]; then
+    echo "Error: CONDA_SH is not configured. Please configure it in $SCRIPTDIR/config!" >> /dev/stderr
+    exit 1
+elif [[ -z "$DCUBE_HOME" ]]; then
+    echo "Error: DCUBE_HOME is not configured. Please configure it in $SCRIPTDIR/config!" >> /dev/stderr
+    exit 1
+elif [[ -z "$CUBEENV" ]]; then
+    echo "Warning: No name for the Datacube conda environment configured. Using 'cubeenv'."
+    CUBEENV="cubeenv"
+fi
 
-# Sets the location of the datacube home where everything resides. Change here,
-# if another location is desired.
-declare -r DCUBE_HOME="$HOME/datacube"
+# make variables read-only
+declare -r CONDA_SH="$CONDA_SH"
+declare -r CUBEENV="$CUBEENV"
+declare -r DCUBE_HOME="$DCUBE_HOME"
 
 declare -r DATA_HOME="$DCUBE_HOME/data"
-if [[ -n "$SCRIPTDIR" ]]; then
-    declare -r PATCHDIR="$(readlink -f "${SCRIPTDIR}/../patches")"
-    declare -r CONFDIR="$(readlink -f "${SCRIPTDIR}/../conf")"
-fi
+declare -r PATCHDIR="$(readlink -f "${SCRIPTDIR}/../patches")"
+declare -r CONFDIR="$(readlink -f "${SCRIPTDIR}/../conf")"
 
 # determine init system (non-systemd case is for Ubuntu 16.04)
 if pidof systemd > /dev/null; then
@@ -49,9 +60,15 @@ else
     declare -r INITSYS="other"
 fi
 
-###############################################################################
+################################################################################
+# Loading conda
+################################################################################
+# abort if loading conda fails
+source "$CONDA_SH" || exit 1
+
+################################################################################
 # Helper Functions
-###############################################################################
+################################################################################
 
 ##
 # Returns 0 if a conda environment is active, else returns 1.
@@ -68,7 +85,7 @@ function _isInVenv {
 function _activate {
     _isInVenv || {
         echo "Activating environment $CUBEENV";
-        source activate "$CUBEENV";
+        conda activate "$CUBEENV";
     }
 }
 
@@ -77,7 +94,7 @@ function _activate {
 function _deactivate {
     _isInVenv && {
         echo "Deactivating environment $CUBEENV";
-        source deactivate "$CUBEENV";
+        conda deactivate;
     }
 }
 

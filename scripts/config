@@ -1,0 +1,16 @@
+################################################################################
+# Configuration file for the Datacube Setup Scripts.
+################################################################################
+# Change the values to suit your environment. You can use environment variables
+# your shell understands, like $HOME.
+
+# path of the script that loads conda
+CONDA_SH="$HOME/anaconda3/etc/profile/conda.sh"
+
+# name of the conda environment that is created for the datacube
+CUBEENV="cubeenv"
+
+# directory where the Datacube's data and the Datacube UI are stored
+DCUBE_HOME="$HOME/datacube"
+
+# vim: filetype=sh

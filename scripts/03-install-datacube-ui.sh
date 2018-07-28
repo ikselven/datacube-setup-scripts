@@ -151,9 +151,16 @@ _exsed --in-place "s/^(\s*'PASSWORD': ?).*$/\1'\
 $(_exsed --quiet "s/^db_password: (.*)$/\1/p" "$HOME/.datacube.conf" | _sedescape)\
 ',/" "$DJANGO_SETTINGS"
 
+# configure HOST for agdc database
+_exsed --in-place "{
+N
+/^\s+'PASSWORD': .+,?\n\s+'HOST':/! s/^(\s+)('PASSWORD': .+,?)\n/\1\2\n\1'HOST': 'localhost'\n/p
+D
+}" "$DJANGO_SETTINGS"
+
 # configure TIME_ZONE (using timedatectl or /etc/timezone)
 echo "[DCUI-SETUP-DJANGO] Configuring timezone..."
-if which timedatectl > /dev/null; then
+if which timedatectl > /dev/null && timedatectl status 2>&1 > /dev/null; then
     _exsed --in-place "s/^(TIME_ZONE = ).*/\1'\
 $(timedatectl status | awk '$1 ~ /Time/ && $2 ~ /zone:/ { print $3 }' | _sedescape)\
 '/" "$DJANGO_SETTINGS"
@@ -167,6 +174,7 @@ fi
 # copy database login from datacube.conf into .pgpass file
 echo "*:*:*:$(_exsed --quiet "s/^db_username: (.*)$/\1/p" "$HOME/.datacube.conf"):$(_exsed --quiet "s/^db_password: (.*)$/\1/p" "$HOME/.datacube.conf" | _exsed -e 's/:/\\:/g' -e 's/\\/\\\\/g')" \
     >> "$HOME/.pgpass"
+chmod 0600 "$HOME/.pgpass"
 
 
 echo "[DCUI-SETUP] Checking for Postfix installation..."

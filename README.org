@@ -32,14 +32,16 @@ to configure it themselves. The Apache setup does *not* offer this option yet.
 ** Preparation
 - setup a (virtual) machine with Debian Stretch
 - create a regular user with sudo permission
-- install [[https://www.anaconda.com/download/#linux][Anaconda]] in your home
-  directory
-- create a directory called =datacube= in your home directory
+- install [[https://www.anaconda.com/download/#linux][Anaconda]] to a
+  directory of your desire, e.g. your home directory
+- create a directory called =datacube=, e.g. in your home directory, where
+  the Datacube's data and the Datacube UI will reside
+- edit =scripts/config= and adjust the 3 settings to suit your situation
 - download satellite data that should be added to the datacube
 
 ** Setup of the Datacube
-Change into =~/datacube= and clone this repository. Run
-=scripts/01-install-datacube.sh= to install the Datacube
+Change into the previously created =datacube= directory and clone this
+repository. Run =scripts/01-install-datacube.sh= to install the Datacube
 software, PostgreSQL and initialize the database for the Datacube. If you
 want to configure PostgreSQL manually, this is what the script will change in
 the default configuration:
@@ -120,6 +122,10 @@ in the conda environment. There 2 workarounds for this, both are /hacky/:
 Run "manage.py check" inside the =data_cube_ui= directory and fix the issues
 reported there. This message might appear e.g. when using the Datacube UI in
 combination with Django 2 without having migrated to Django 2.
+
+** License
+The scripts in this repository are free software and distributed the terms of
+the GNU Public License 3.0 or any later version.
 
 ** Funding
 This project has received funding from the European Union's Horizon 2020 research and innovation programme under grant agreement No 642088. It is related to the project [[http://swos-service.eu][Satellite-based Wetland Observation Service]] (SWOS) and related work of the [[http://www.eo.uni-jena.de][Friedrich Schiller University Jena - Department for Earth Observation]].
