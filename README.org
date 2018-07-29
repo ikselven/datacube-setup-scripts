@@ -124,7 +124,7 @@ reported there. This message might appear e.g. when using the Datacube UI in
 combination with Django 2 without having migrated to Django 2.
 
 ** License
-The scripts in this repository are free software and distributed the terms of
+The scripts in this repository are free software distributed under the terms of
 the GNU General Public License 3.0 or any later version.
 
 ** Funding
