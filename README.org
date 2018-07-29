@@ -125,7 +125,7 @@ combination with Django 2 without having migrated to Django 2.
 
 ** License
 The scripts in this repository are free software and distributed the terms of
-the GNU Public License 3.0 or any later version.
+the GNU General Public License 3.0 or any later version.
 
 ** Funding
 This project has received funding from the European Union's Horizon 2020 research and innovation programme under grant agreement No 642088. It is related to the project [[http://swos-service.eu][Satellite-based Wetland Observation Service]] (SWOS) and related work of the [[http://www.eo.uni-jena.de][Friedrich Schiller University Jena - Department for Earth Observation]].
