@@ -87,7 +87,7 @@ sudo apt install --assume-yes "${PACKAGES[@]}"
 
 echo "[DCUI-Setup] Installing required python packages into conda environment..."
 declare -ar PYTHON_PACKAGES=(
-django
+"django=2.0.8"
 redis
 imageio
 django-bootstrap3
