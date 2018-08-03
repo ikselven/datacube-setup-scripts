@@ -152,11 +152,7 @@ $(_exsed --quiet "s/^db_password: (.*)$/\1/p" "$HOME/.datacube.conf" | _sedescap
 ',/" "$DJANGO_SETTINGS"
 
 # configure HOST for agdc database
-_exsed --in-place "{
-N
-/^\s+'PASSWORD': .+,?\n\s+'HOST':/! s/^(\s+)('PASSWORD': .+,?)\n/\1\2\n\1'HOST': 'localhost'\n/p
-D
-}" "$DJANGO_SETTINGS"
+perl -i -pe "BEGIN{undef \$/;} s/(\s+)('PASSWORD': ?'.*',?)(\n)(?!\s+'HOST': ?'.*',?\n)(\s+\},?)/\1\2\1'HOST': 'localhost',\3\4/g" "$DJANGO_SETTINGS"
 
 # configure TIME_ZONE (using timedatectl or /etc/timezone)
 echo "[DCUI-SETUP-DJANGO] Configuring timezone..."
