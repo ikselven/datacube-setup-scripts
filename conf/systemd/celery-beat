@@ -3,7 +3,7 @@ CELERY_BIN="path/to/bin/celery"
 CELERY_APP="data_cube_ui"
 DJANGO_SETTINGS_MODULE="data_cube_ui.settings"
 
-CELERY_CHDIR="path/to/datacube/data_cube_ui"
+# CELERYD_CHDIR: see WorkingDirectory in unit file
 
 # extra command-line arguments for the beat service
 CELERYBEAT_OPTS=""

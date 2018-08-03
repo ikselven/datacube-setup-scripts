@@ -5,7 +5,7 @@ CELERY_BIN="path/to/bin/celery"
 CELERY_APP="data_cube_ui"
 DJANGO_SETTINGS_MODULE="data_cube_ui.settings"
 
-CELERY_CHDIR="path/to/datacube/data_cube_ui"
+# CELERYD_CHDIR: see WorkingDirectory in unit file
 
 # extra command-line arguments for the worker
 CELERYD_OPTS="-c:task_processing 10 -c:data_cube_manager 2 --max-tasks-per-child:data_cube_manager=1 -Q:data_cube_manager data_cube_manager -Ofair"

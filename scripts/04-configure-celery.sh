@@ -29,25 +29,25 @@ declare -r GROUP="$(id --group --name $USER)"
 function _systemd_celery_setup {
     echo "[DC_CELERY-SETUP] Installing celery systemd service..."
     _exsed --in-place \
-        -e "s,(User=\").*\",\1$USER\"," \
-        -e "s,(Group=\").*\",\1$GROUP\"," \
+        -e "s,(User=).*,\1$USER," \
+        -e "s,(Group=).*,\1$GROUP," \
+        -e "s,(WorkingDirectory=).*,\1$DCUBE_HOME/data_cube_ui," \
         "${CONFDIR}/systemd/celery.service"
     sudo install -vDm644 "${CONFDIR}/systemd/celery.service" /etc/systemd/system/celery.service
     _exsed --in-place \
         -e "s,(CELERY_BIN=\").*\",\1$celery_bin\"," \
-        -e "s,(CELERYD_CHDIR=\").*\",\1$DCUBE_HOME/data_cube_ui\"," \
         "${CONFDIR}/systemd/celery"
     sudo install -vDm644 "${CONFDIR}/systemd/celery" /etc/conf.d/celery
 
     echo "[DC_CELERY-SETUP] Installing celery-beat service..."
     _exsed --in-place \
-        -e "s,(User=\").*\",\1$USER\"," \
-        -e "s,(Group=\").*\",\1$GROUP\"," \
+        -e "s,(User=).*,\1$USER," \
+        -e "s,(Group=).*,\1$GROUP," \
+        -e "s,(WorkingDirectory=).*,\1$DCUBE_HOME/data_cube_ui," \
         "${CONFDIR}/systemd/celery-beat.service"
     sudo install -vDm644 "${CONFDIR}/systemd/celery-beat.service" /etc/systemd/system/celery-beat.service
     _exsed --in-place \
         -e "s,(CELERY_BIN=\").*\",\1$celery_bin\"," \
-        -e "s,(CELERYD_CHDIR=\").*\",\1$DCUBE_HOME/data_cube_ui\"," \
         "${CONFDIR}/systemd/celery-beat"
     sudo install -vDm644 "${CONFDIR}/systemd/celery-beat" /etc/conf.d/celery-beat
 

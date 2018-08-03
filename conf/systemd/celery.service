@@ -7,7 +7,7 @@ Type=forking
 User=localuser
 Group=localuser
 EnvironmentFile=/etc/conf.d/celery
-WorkingDirectory="${CELERYD_CHDIR}"
+WorkingDirectory=/home/localuser/Datacube/data_cube_ui
 ExecStart=/bin/sh -c '${CELERY_BIN} multi start ${CELERYD_NODES} \
     -A ${CELERY_APP} \
     --pidfile=${CELERYD_PID_FILE} \
