@@ -26,7 +26,7 @@ sudo apt install binutils
 
 echo "[DATACUBE-SETUP] Setting up conda and creating environment..."
 
-conda config --add channels conda-forge
+conda config --append channels conda-forge
 conda create --yes --name "$CUBEENV" python=3.6 datacube cython jupyter matplotlib scipy
 
 echo "[DATACUBE-SETUP] Preparing PostgreSQL for the Datacube..."
