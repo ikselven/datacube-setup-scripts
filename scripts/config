@@ -5,7 +5,7 @@
 # your shell understands, like $HOME.
 
 # path of the script that loads conda
-CONDA_SH="$HOME/anaconda3/etc/profile/conda.sh"
+CONDA_SH="$HOME/anaconda3/etc/profile.d/conda.sh"
 
 # name of the conda environment that is created for the datacube
 CUBEENV="cubeenv"
