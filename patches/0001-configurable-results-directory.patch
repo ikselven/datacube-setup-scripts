@@ -45,6 +45,18 @@ index aed81ec..e17742d 100644
  
      class Meta(BaseQuery.Meta):
          unique_together = (('satellite', 'area_id', 'time_start', 'time_end', 'latitude_max', 'latitude_min',
+diff --git a/apps/cloud_coverage/tasks.py b/apps/cloud_coverage/tasks.py
+index c817ec7..5e69382 100644
+--- a/apps/cloud_coverage/tasks.py
++++ b/apps/cloud_coverage/tasks.py
+@@ -367,6 +367,7 @@ def create_output_products(data, task_id=None):
+             titles="Clean Pixel Percentage Per Acquisition")
+ 
+     logger.info("All products created.")
++    task.rewrite_pathnames()
+     # task.update_bounds_from_dataset(dataset)
+     task.complete = True
+     task.execution_end = datetime.now()
 diff --git a/apps/coastal_change/models.py b/apps/coastal_change/models.py
 index 9155239..7d39ac5 100755
 --- a/apps/coastal_change/models.py
@@ -68,6 +80,18 @@ index 9155239..7d39ac5 100755
  
      class Meta(BaseQuery.Meta):
          unique_together = (('satellite', 'area_id', 'time_start', 'time_end', 'latitude_max', 'latitude_min',
+diff --git a/apps/coastal_change/tasks.py b/apps/coastal_change/tasks.py
+index 356c689..e29ff1f 100755
+--- a/apps/coastal_change/tasks.py
++++ b/apps/coastal_change/tasks.py
+@@ -422,6 +422,7 @@ def create_output_products(data, task_id=None):
+                     writer.append_data(image)
+ 
+     logger.info("All products created.")
++    task.rewrite_pathnames()
+     # task.update_bounds_from_dataset(dataset)
+     task.complete = True
+     task.execution_end = datetime.now()
 diff --git a/apps/custom_mosaic_tool/models.py b/apps/custom_mosaic_tool/models.py
 index e80a3a2..bb07b8e 100755
 --- a/apps/custom_mosaic_tool/models.py
@@ -91,8 +115,20 @@ index e80a3a2..bb07b8e 100755
  
      class Meta(BaseQuery.Meta):
          unique_together = (
+diff --git a/apps/custom_mosaic_tool/tasks.py b/apps/custom_mosaic_tool/tasks.py
+index 54eb966..e8d4d96 100755
+--- a/apps/custom_mosaic_tool/tasks.py
++++ b/apps/custom_mosaic_tool/tasks.py
+@@ -519,6 +519,7 @@ def create_output_products(data, task_id=None):
+             titles="Clean Pixel Percentage Per Acquisition")
+ 
+     logger.info("All products created.")
++    task.rewrite_pathnames()
+     # task.update_bounds_from_dataset(dataset)
+     task.complete = True
+     task.execution_end = datetime.now()
 diff --git a/apps/data_cube_manager/tasks.py b/apps/data_cube_manager/tasks.py
-index 852fecd..abf708c 100644
+index 852fecd..d0c3215 100644
 --- a/apps/data_cube_manager/tasks.py
 +++ b/apps/data_cube_manager/tasks.py
 @@ -64,7 +64,7 @@ def update_data_cube_details(ingested_only=True):
@@ -100,7 +136,7 @@ index 852fecd..abf708c 100644
          Q(definition__has_keys=['managed']) & Q(definition__has_keys=['measurements']))
  
 -    dc = DataAccessApi(config='/home/' + settings.LOCAL_USER + '/Datacube/data_cube_ui/config/.datacube.conf')
-+    dc = DataAccessApi(config=os.path.join(settings.BASE_DIR, 'config/.datacube.conf'))
++    dc = DataAccessApi(config=os.path.join(os.getenv('HOME'), '.datacube.conf'))
  
      for dataset_type in dataset_types:
          ingestion_details, created = IngestionDetails.objects.get_or_create(
@@ -109,7 +145,7 @@ index 852fecd..abf708c 100644
          The primary key of the new dataset type.
      """
 -    conf_path = '/home/' + settings.LOCAL_USER + '/Datacube/data_cube_ui/config/.datacube.conf'
-+    conf_path = os.path.join(settings.BASE_DIR, 'config/.datacube.conf')
++    conf_path = os.path.join(os.getenv('HOME'), '.datacube.conf')
      index = index_connect(local_config=LocalConfig.find([conf_path]))
  
      source_type, output_type = ingest.make_output_type(index, ingestion_definition)
@@ -118,12 +154,12 @@ index 852fecd..abf708c 100644
          ingestion_definition: dict representing a Data Cube ingestion def produced using the utils func.
      """
 -    conf_path = '/home/' + settings.LOCAL_USER + '/Datacube/data_cube_ui/config/.datacube.conf'
-+    conf_path = os.path.join(settings.BASE_DIR, 'config/.datacube.conf')
++    conf_path = os.path.join(os.getenv('HOME'), '.datacube.conf')
      index = index_connect(local_config=LocalConfig.find([conf_path]))
  
      tasks = ingest.create_task_list(index, output_type, None, source_type, ingestion_definition)
 diff --git a/apps/data_cube_manager/views/dataset_type.py b/apps/data_cube_manager/views/dataset_type.py
-index 8107005..abd5d38 100644
+index 8107005..fb7cc7c 100644
 --- a/apps/data_cube_manager/views/dataset_type.py
 +++ b/apps/data_cube_manager/views/dataset_type.py
 @@ -108,7 +108,7 @@ class DatasetTypeView(View):
@@ -131,7 +167,7 @@ index 8107005..abd5d38 100644
          product_def = utils.dataset_type_definition_from_forms(metadata_form, measurement_forms)
  
 -        conf_path = '/home/' + settings.LOCAL_USER + '/Datacube/data_cube_ui/config/.datacube.conf'
-+        conf_path = os.path.join(settings.BASE_DIR, 'config/.datacube.conf')
++        conf_path = os.path.join(os.getenv('HOME'), '.datacube.conf')
          index = index_connect(local_config=conf_path)
          try:
              type_ = index.products.from_doc(product_def)
@@ -241,7 +277,7 @@ index c42919e..8ff58cc 100644
      class Meta(BaseQuery.Meta):
          unique_together = (
 diff --git a/apps/dc_algorithm/models/abstract_base_models.py b/apps/dc_algorithm/models/abstract_base_models.py
-index 147dad9..908bf44 100644
+index 147dad9..22ef8df 100644
 --- a/apps/dc_algorithm/models/abstract_base_models.py
 +++ b/apps/dc_algorithm/models/abstract_base_models.py
 @@ -79,7 +79,7 @@ class Query(models.Model):
@@ -249,12 +285,35 @@ index 147dad9..908bf44 100644
      complete = models.BooleanField(default=False)
  
 -    config_path = '/home/' + settings.LOCAL_USER + '/Datacube/data_cube_ui/config/.datacube.conf'
-+    config_path = os.path.join(settings.BASE_DIR, 'config/.datacube.conf')
++    config_path = os.path.join(os.getenv('HOME'), '.datacube.conf')
  
      class Meta:
          abstract = True
+@@ -440,6 +440,22 @@ class Result(models.Model):
+         clamped_int = max(0, min(rounded_int, 100))
+         return clamped_int
+ 
++    def rewrite_pathnames(self):
++        """Rewrites all paths to be stored in the database to something the web server can serve
++
++        Converts the absolute paths of all files created during a task into paths relative
++        to the RESULTS_DATA_DIR configured in the Datacube UI's Django settings. This is done
++        by iterating over all attributes of the task and applying the conversion to those attributes
++        that are of type "str" and have a name ending in "_path".
++        """
++        for attr in dir(self):
++            if attr.endswith("_path") and isinstance(getattr(self, attr), str):
++                path = getattr(self, attr)
++                if path.startswith(settings.RESULTS_DATA_DIR):
++                    stripped_path = path.replace(settings.RESULTS_DATA_DIR, '', 1).lstrip(os.path.sep)
++                    path = os.path.join(os.path.sep, "datacube", "ui_results", stripped_path)
++                    setattr(self, attr, path)
++
+ 
+ class GenericTask(Query, Metadata, Result):
+     """Serves as the model for an algorithm task containing a Query, Metadata, and Result
 diff --git a/apps/dc_algorithm/views.py b/apps/dc_algorithm/views.py
-index 115261f..ddb558e 100644
+index 115261f..d29e9db 100644
 --- a/apps/dc_algorithm/views.py
 +++ b/apps/dc_algorithm/views.py
 @@ -18,6 +18,7 @@
@@ -273,42 +332,6 @@ index 115261f..ddb558e 100644
  
  from .models import Application, Satellite, Area
  
-@@ -620,6 +622,20 @@ class GetTaskResult(View, ToolClass):
- 
-     """
- 
-+    def _rewrite_path(self, path):
-+        """Rewrites a path that is stored in the database to something the web server can serve
-+
-+        Args:
-+            path to rewrite
-+
-+        Returns:
-+            A String containing a web server friendly path
-+        """
-+        if path.startswith(settings.RESULTS_DATA_DIR):
-+            stripped_path = path.replace(settings.RESULTS_DATA_DIR, '', 1).lstrip(os.path.sep)
-+            path = os.path.join(os.path.sep, "datacube", "ui_results", stripped_path)
-+        return path
-+
-     def get(self, request):
-         """Get a JsonResponse containing a status and Task model if complete
- 
-@@ -643,7 +659,13 @@ class GetTaskResult(View, ToolClass):
-         try:
-             requested_task = task_model.objects.get(pk=request.GET['id'])
-             if requested_task.status == "OK" and requested_task.complete:
--                response.update(model_to_dict(requested_task))
-+                payload = model_to_dict(requested_task)
-+
-+                for key in payload.keys():
-+                    if key.endswith("_path"):
-+                        payload[key] = self._rewrite_path(payload[key])
-+
-+                response.update(payload)
-                 response['status'] = "OK"
-             elif requested_task.status == "ERROR":
-                 response['status'] = "ERROR"
 diff --git a/apps/fractional_cover/models.py b/apps/fractional_cover/models.py
 index 9934b24..64b2a23 100755
 --- a/apps/fractional_cover/models.py
@@ -332,6 +355,18 @@ index 9934b24..64b2a23 100755
  
      class Meta(BaseQuery.Meta):
          unique_together = (('satellite', 'area_id', 'time_start', 'time_end', 'latitude_max', 'latitude_min',
+diff --git a/apps/fractional_cover/tasks.py b/apps/fractional_cover/tasks.py
+index 670a7a1..d0c400b 100755
+--- a/apps/fractional_cover/tasks.py
++++ b/apps/fractional_cover/tasks.py
+@@ -504,6 +504,7 @@ def create_output_products(data, task_id=None):
+             titles="Clean Pixel Percentage Per Acquisition")
+ 
+     logger.info("All products created.")
++    task.rewrite_pathnames()
+     # task.update_bounds_from_dataset(dataset)
+     task.complete = True
+     task.execution_end = datetime.now()
 diff --git a/apps/ndvi_anomaly/models.py b/apps/ndvi_anomaly/models.py
 index 7e27892..c99bfad 100755
 --- a/apps/ndvi_anomaly/models.py
@@ -366,6 +401,18 @@ index 7e27892..c99bfad 100755
      }
  
      class Meta(BaseQuery.Meta):
+diff --git a/apps/ndvi_anomaly/tasks.py b/apps/ndvi_anomaly/tasks.py
+index 0e87a00..7d39a17 100755
+--- a/apps/ndvi_anomaly/tasks.py
++++ b/apps/ndvi_anomaly/tasks.py
+@@ -428,6 +428,7 @@ def create_output_products(data, task_id=None):
+             titles="Clean Pixel Percentage Per Acquisition")
+ 
+     logger.info("All products created.")
++    task.rewrite_pathnames()
+     # task.update_bounds_from_dataset(dataset)
+     task.complete = True
+     task.execution_end = datetime.now()
 diff --git a/apps/slip/models.py b/apps/slip/models.py
 index 7800fd6..b640c60 100755
 --- a/apps/slip/models.py
@@ -389,6 +436,18 @@ index 7800fd6..b640c60 100755
  
      class Meta(BaseQuery.Meta):
          unique_together = (
+diff --git a/apps/slip/tasks.py b/apps/slip/tasks.py
+index c87240c..2749c85 100755
+--- a/apps/slip/tasks.py
++++ b/apps/slip/tasks.py
+@@ -461,6 +461,7 @@ def create_output_products(data, task_id=None):
+             titles=["Clean Pixel Percentage Per Acquisition", "SLIP Pixels Percentage Per Acquisition"])
+ 
+     logger.info("All products created.")
++    task.rewrite_pathnames()
+     # task.update_bounds_from_dataset(dataset)
+     task.complete = True
+     task.execution_end = datetime.now()
 diff --git a/apps/spectral_indices/models.py b/apps/spectral_indices/models.py
 index e73f90e..c8b3eac 100644
 --- a/apps/spectral_indices/models.py
@@ -426,6 +485,18 @@ index e73f90e..c8b3eac 100644
  
      class Meta(BaseQuery.Meta):
          unique_together = (('satellite', 'area_id', 'time_start', 'time_end', 'latitude_max', 'latitude_min',
+diff --git a/apps/spectral_indices/tasks.py b/apps/spectral_indices/tasks.py
+index 0d4c2a4..1b4e1b5 100644
+--- a/apps/spectral_indices/tasks.py
++++ b/apps/spectral_indices/tasks.py
+@@ -502,6 +502,7 @@ def create_output_products(data, task_id=None):
+             titles="Clean Pixel Percentage Per Acquisition")
+ 
+     logger.info("All products created.")
++    task.rewrite_pathnames()
+     # task.update_bounds_from_dataset(dataset)
+     task.complete = True
+     task.execution_end = datetime.now()
 diff --git a/apps/tsm/models.py b/apps/tsm/models.py
 index 8abe227..7eef74e 100755
 --- a/apps/tsm/models.py
@@ -470,6 +541,18 @@ index 8abe227..7eef74e 100755
      }
  
      class Meta(BaseQuery.Meta):
+diff --git a/apps/tsm/tasks.py b/apps/tsm/tasks.py
+index a6e3ba3..074233d 100755
+--- a/apps/tsm/tasks.py
++++ b/apps/tsm/tasks.py
+@@ -537,6 +537,7 @@ def create_output_products(data, task_id=None):
+             titles="Clean Pixel Percentage Per Acquisition")
+ 
+     logger.info("All products created.")
++    task.rewrite_pathnames()
+     task.update_bounds_from_dataset(dataset_masked)
+     task.complete = True
+     task.execution_end = datetime.now()
 diff --git a/apps/urbanization/models.py b/apps/urbanization/models.py
 index d4aa3eb..687ea9d 100644
 --- a/apps/urbanization/models.py
@@ -491,6 +574,18 @@ index d4aa3eb..687ea9d 100644
  
      class Meta(BaseQuery.Meta):
          unique_together = (('satellite', 'area_id', 'time_start', 'time_end', 'latitude_max', 'latitude_min',
+diff --git a/apps/urbanization/tasks.py b/apps/urbanization/tasks.py
+index caf2993..5a924bc 100644
+--- a/apps/urbanization/tasks.py
++++ b/apps/urbanization/tasks.py
+@@ -480,6 +480,7 @@ def create_output_products(data, task_id=None):
+             titles="Clean Pixel Percentage Per Acquisition")
+ 
+     logger.info("All products created.")
++    task.rewrite_pathnames()
+     # task.update_bounds_from_dataset(dataset)
+     task.complete = True
+     task.execution_end = datetime.now()
 diff --git a/apps/water_detection/models.py b/apps/water_detection/models.py
 index 2917d25..150ca08 100755
 --- a/apps/water_detection/models.py
@@ -525,8 +620,20 @@ index 2917d25..150ca08 100755
      }
  
      class Meta(BaseQuery.Meta):
+diff --git a/apps/water_detection/tasks.py b/apps/water_detection/tasks.py
+index 9ac4891..808b9f5 100755
+--- a/apps/water_detection/tasks.py
++++ b/apps/water_detection/tasks.py
+@@ -508,6 +508,7 @@ def create_output_products(data, task_id=None):
+             titles=["Clean Pixel Percentage Per Acquisition", "Water Pixels Percentage Per Acquisition"])
+ 
+     logger.info("All products created.")
++    task.rewrite_pathnames()
+     # task.update_bounds_from_dataset(dataset)
+     task.complete = True
+     task.execution_end = datetime.now()
 diff --git a/data_cube_ui/settings.py b/data_cube_ui/settings.py
-index 3cc7a6c..eafe70b 100755
+index 3cc7a6c..43b2185 100755
 --- a/data_cube_ui/settings.py
 +++ b/data_cube_ui/settings.py
 @@ -57,6 +57,8 @@ EMAIL_PORT = '25'
@@ -548,7 +655,7 @@ index 3cc7a6c..eafe70b 100755
  
  # CELERY STUFF
 diff --git a/docs/adding_new_pages.md b/docs/adding_new_pages.md
-index 3125258..1717e01 100644
+index 3125258..b9fdc30 100644
 --- a/docs/adding_new_pages.md
 +++ b/docs/adding_new_pages.md
 @@ -73,9 +73,9 @@ class Query(BaseQuery):
@@ -556,7 +663,7 @@ index 3125258..1717e01 100644
      animated_product = models.ForeignKey(AnimationType)
  
 -    config_path = '/home/' + settings.LOCAL_USER + '/Datacube/data_cube_ui/config/.datacube.conf'
-+    config_path = os.path.join(settings.BASE_DIR, 'data_cube_ui/config/.datacube.conf')
++    config_path = os.path.join(os.getenv('HOME'), '.datacube.conf')
      measurements = ['blue', 'green', 'red', 'nir', 'swir1', 'swir2', 'cf_mask']
 -    base_result_dir = '/datacube/ui_results/coastal_change'
 +    base_result_dir = os.path.join(settings.RESULTS_DATA_DIR, 'coastal_change')
