@@ -17,11 +17,12 @@ might fail.
 The scripts are developed on a Debian Stretch system, and have been additionally
 tested on an Ubuntu 16.04 using upstart instead of systemd. Requirements such as
 PostgreSQL, Postfix and Apache are installed via =apt= while Python packages
-are installed via =conda=, falling back on =pip= if necessary.
+are installed via =conda=, falling back to =pip= if necessary.
 
-On Ubuntu releases other than 16.04, the scripts may work. Be aware though,
-that as package names, package versions or paths might be different, manual
-intervention might be necessary to make the scripts run cleanly.
+On Debian releases other than Stretch or Ubuntu releases other than 16.04,
+the scripts may work. Be aware though, that as package names, package versions
+or paths might be different, manual intervention might be necessary to make the
+scripts run cleanly.
 
 ** Warning
 Originally, the scripts have been developed with an empty environment in mind,
@@ -117,7 +118,7 @@ original data and the 3 files from above. Run the script.
 
 ** Customize the Datacube UI
 After ingestion, a new area needs to be configured and associated with the
-tools available. Please read [[https://github.com/ceos-seo/data_cube_ui/blob/master/docs/ui_install.md#customization][this section of the UI's documentation]] where the necessary steps are described.
+tools available. Please read [[https://github.com/ceos-seo/data_cube_ui/blob/master/docs/ui_install.md#customization][this section of the UI's documentation]], where the necessary steps are described.
 
 --------------------------------------------------------------------------------
 
@@ -136,12 +137,13 @@ reported there. This message might appear e.g. when using the Datacube UI in
 combination with Django 2 without having migrated to Django 2.
 
 *** Ingested datasets are not shown on the page "Datacube Visualization"
-As per [[https://github.com/ceos-seo/data_cube_ui/issues/3#issuecomment-376008532][this comment]] in the repository of the Datacube UI:
+As per [[https://github.com/ceos-seo/data_cube_ui/issues/3#issuecomment-376008532][this comment]] in the repository of the Datacube UI, open a terminal and type the following:
 #+BEGIN_SRC shell
 conda activate cubeenv
 cd /path/to/data_cube_ui
 python manage.py shell
 #+END_SRC
+In the python shell, type:
 #+BEGIN_SRC python
 import apps.data_cube_manager.tasks as dcmt
 dcmt.update_data_cube_details()
