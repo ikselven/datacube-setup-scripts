@@ -81,6 +81,7 @@ apache2
 redis-server
 libfreeimage3
 imagemagick
+gdal-bin
 )
 
 sudo apt install --assume-yes "${PACKAGES[@]}"
