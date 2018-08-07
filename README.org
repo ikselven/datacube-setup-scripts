@@ -29,6 +29,8 @@ i.e. no PostgreSQL, Apache Webserver or Postfix pre-installed. The setup of
 PostgreSQL and Postfix have already been adjusted to give the user the option
 to configure it themselves. The Apache setup does *not* offer this option yet.
 
+--------------------------------------------------------------------------------
+
 ** Preparation
 - setup a (virtual) machine with Debian Stretch
 - create a regular user with sudo permission
@@ -75,8 +77,12 @@ Run =scripts/03-install-datacube-ui.sh=. This will install the
 Datacube UI itself and required software such as: Apache 2 Webserver, Redis,
 ImageMagick, Django and Postfix.
 
-In the dialog, that is shown during installation of Postfix, choose to
-configure as an "Internet site".
+There are two patches included for the Datacube UI: one for making the
+directory, where the Datacube UI stores created product files, configurable
+(required for this setup to work) and another one that bundles changes
+between Django 1.11 and 2.
+
+During installation of Postfix, a dialog will be shown. Choose "Internet site".
 
 If you decide to setup/configure Postfix yourself, here is what the script configures:
 : File: /etc/postfix/main.cf
@@ -109,6 +115,12 @@ For documentation about those files, see the [[https://datacube-core.readthedocs
 Adjust all file paths in =scripts/05-ingest-data.sh= to correctly refer to the
 original data and the 3 files from above. Run the script.
 
+** Customize the Datacube UI
+After ingestion, a new area needs to be configured and associated with the
+tools available. Please read [[https://github.com/ceos-seo/data_cube_ui/blob/master/docs/ui_install.md#customization][this section of the UI's documentation]] where the necessary steps are described.
+
+--------------------------------------------------------------------------------
+
 ** Known Issues
 *** =ImportError: /lib/x86_64-linux-gnu/libz.so.1: version `ZLIB_1.2.9' not found= in Apache error log
 In the current setup with a conda environment, it may occur, that python code
@@ -122,6 +134,27 @@ in the conda environment. There 2 workarounds for this, both are /hacky/:
 Run "manage.py check" inside the =data_cube_ui= directory and fix the issues
 reported there. This message might appear e.g. when using the Datacube UI in
 combination with Django 2 without having migrated to Django 2.
+
+*** Ingested datasets are not shown on the page "Datacube Visualization"
+As per [[https://github.com/ceos-seo/data_cube_ui/issues/3#issuecomment-376008532][this comment]] in the repository of the Datacube UI:
+#+BEGIN_SRC shell
+conda activate cubeenv
+cd /path/to/data_cube_ui
+python manage.py shell
+#+END_SRC
+#+BEGIN_SRC python
+import apps.data_cube_manager.tasks as dcmt
+dcmt.update_data_cube_details()
+#+END_SRC
+
+*** Ingestion does not work in the Datacube UI
+The Datacube UI has a lot of hardcoded usernames and pathnames, so some things
+might not work as expected. E.g. ingestion of data via the interface of the
+Datacube uses a hardcoded username and hardcoded database names. If you
+haven't setup that user, ingestion via UI will not work. However, you can
+ingest data via commandline, using =scripts/05-ingest-data.sh=.
+
+--------------------------------------------------------------------------------
 
 ** License
 The scripts in this repository are free software distributed under the terms of
