@@ -220,35 +220,35 @@ cat <<APACHECONF | sudo tee /etc/apache2/sites-available/dc_ui.conf
     ServerAdmin ${admin_email}
     ServerName ${server_name:-$HOST}
 
-	WSGIDaemonProcess dc_ui python-path=${DCUBE_HOME}/data_cube_ui
-	WSGIProcessGroup dc_ui
-	WSGIApplicationGroup %{GLOBAL}
+    WSGIDaemonProcess dc_ui python-path=${DCUBE_HOME}/data_cube_ui
+    WSGIProcessGroup dc_ui
+    WSGIApplicationGroup %{GLOBAL}
 
-	WSGIScriptAlias / ${DCUBE_HOME}/data_cube_ui/data_cube_ui/wsgi.py
+    WSGIScriptAlias / ${DCUBE_HOME}/data_cube_ui/data_cube_ui/wsgi.py
 
-	<Directory "${DCUBE_HOME}/data_cube_ui/data_cube_ui/">
-		<Files wsgi.py>
-			Require all granted
-		</Files>
-	</Directory>
+    <Directory "${DCUBE_HOME}/data_cube_ui/data_cube_ui/">
+    	<Files wsgi.py>
+    		Require all granted
+    	</Files>
+    </Directory>
 
-	#django static
-	Alias /static/ ${DCUBE_HOME}/data_cube_ui/static/
-	<Directory ${DCUBE_HOME}/data_cube_ui/static>
-		Require all granted
-	</Directory>
+    #django static
+    Alias /static/ ${DCUBE_HOME}/data_cube_ui/static/
+    <Directory ${DCUBE_HOME}/data_cube_ui/static>
+    	Require all granted
+    </Directory>
 
-	#results.
-	Alias /datacube/ ${DATA_HOME}/
-	<Directory ${DATA_HOME}/>
-		Require all granted
-	</Directory>
+    #results.
+    Alias /datacube/ ${DATA_HOME}/
+    <Directory ${DATA_HOME}/>
+    	Require all granted
+    </Directory>
 
-	# enable compression
-	SetOutputFilter DEFLATE
+    # enable compression
+    SetOutputFilter DEFLATE
 
-	ErrorLog \${APACHE_LOG_DIR}/datacube-error.log
-	CustomLog \${APACHE_LOG_DIR}/datacube-access.log combined
+    ErrorLog \${APACHE_LOG_DIR}/datacube-error.log
+    CustomLog \${APACHE_LOG_DIR}/datacube-access.log combined
 
 </VirtualHost>
 
