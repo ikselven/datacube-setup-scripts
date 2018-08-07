@@ -59,9 +59,9 @@ function _systemd_celery_setup {
     echo "[DC_CELERY-SETUP] Reloading systemd configuration..."
     sudo systemctl daemon-reload
 
-    echo "[DC_CELERY-SETUP] Raising celery and celery-beat services..."
-    sudo systemctl start celery
-    sudo systemctl start celery-beat
+    echo "[DC_CELERY-SETUP] Enabling and raising celery and celery-beat services..."
+    sudo systemctl enable --now celery
+    sudo systemctl enable --now celery-beat
 }
 
 function _upstart_celery_setup {
