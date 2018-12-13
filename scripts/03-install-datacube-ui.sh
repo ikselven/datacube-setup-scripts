@@ -72,7 +72,7 @@ case "$shall_patch_django" in
         echo "[DCUI-Setup] Skipping application of patch for Django 2.0..."
         ;;
 esac
-unset shall_patch
+unset shall_patch_django
 
 
 echo "[DCUI-Setup] Installing required packages from distro repository..."
